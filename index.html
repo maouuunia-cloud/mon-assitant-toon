@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TextToon Assistant</title>
+    <!-- Chargement de Tailwind CSS pour le style -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Import Map pour résoudre les modules React sans compilateur lourd -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@18.2.0",
+          "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+          "lucide-react": "https://esm.sh/lucide-react@0.284.0"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Le type="module" est essentiel ici -->
+    <script type="module">
+      import React from 'react';
+      import ReactDOM from 'react-dom/client';
+      
+      // Utilisation d'un chemin relatif explicite pour éviter les erreurs de résolution
+      import App from './App.jsx';
+
+      const rootElement = document.getElementById('root');
+      if (rootElement) {
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(
+          React.createElement(React.StrictMode, null, 
+            React.createElement(App)
+          )
+        );
+      }
+    </script>
+  </body>
+</html>
