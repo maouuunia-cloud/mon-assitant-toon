@@ -1,107 +1,33 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>TextToon Assistant</title>
-    
-    <!-- Configuration PWA (Effet App plein écran) -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TextToon">
-    <meta name="mobile-web-app-capable" content="yes">
-    
-    <!-- Deep Linking : Protocoles pour forcer l'ouverture de l'application WEBTOON -->
-    <meta name="apple-itunes-app" content="app-id=881561345">
-    <meta property="al:ios:app_store_id" content="881561345">
-    <meta property="al:ios:app_name" content="WEBTOON">
-    <meta property="al:ios:url" content="linewebtoon://">
+<script>
+  document.addEventListener('click', function (e) {
+    const link = e.target.closest('a');
+    if (!link) return;
 
-    <meta property="al:android:package" content="com.naver.linewebtoon">
-    <meta property="al:android:app_name" content="WEBTOON">
-    <meta property="al:android:url" content="linewebtoon://">
+    const href = link.href;
+    if (!href.includes('webtoons.com')) return;
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Babel pour transformer le JSX en direct -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    e.preventDefault();
 
-    <!-- Import Map pour React et Lucide -->
-    <script type="importmap">
-      {
-        "imports": {
-          "react": "https://esm.sh/react@18.2.0",
-          "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-          "lucide-react": "https://esm.sh/lucide-react@0.284.0"
-        }
-      }
-    </script>
+    let titleNo = null;
 
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        width: 100vw;
-        height: 100vh;
-        background-color: #171717;
-      }
-      #root {
-        height: 100%;
-        width: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-    
-    <!-- Script global pour intercepter les redirections vers Webtoon -->
-    <script>
-      window.addEventListener('click', function(e) {
-        const target = e.target.closest('a');
-        if (target && target.href.includes('webtoons.com')) {
-          e.preventDefault();
-          const webtoonUrl = target.href;
-          
-          // Tentative d'ouverture via le protocole natif
-          // Format type: linewebtoon://title/list?titleNo=753
-          const urlParams = new URL(webtoonUrl).searchParams;
-          const titleNo = urlParams.get('title_no');
-          
-          const nativeAppUrl = titleNo 
-            ? `linewebtoon://title/list?titleNo=${titleNo}` 
-            : `linewebtoon://`;
+    try {
+      const url = new URL(href);
+      titleNo = url.searchParams.get('title_no');
+    } catch (err) {
+      console.error('URL invalide', err);
+    }
 
-          // On tente d'ouvrir l'app
-          window.location.href = nativeAppUrl;
+    // Deep link officiel Webtoon
+    const appUrl = titleNo
+      ? `linewebtoon://title/list?titleNo=${titleNo}`
+      : `linewebtoon://`;
 
-          // Si l'app n'est pas installée, on ouvre le web après un court délai
-          setTimeout(() => {
-            window.location.href = webtoonUrl;
-          }, 500);
-        }
-      }, true);
-    </script>
+    // Tentative ouverture app
+    window.location.assign(appUrl);
 
-    <!-- Chargement de App.jsx -->
-    <script type="text/babel" data-type="module" src="./App.jsx"></script>
-
-    <!-- Script de lancement -->
-    <script type="text/babel" data-type="module">
-      import React from 'react';
-      import ReactDOM from 'react-dom/client';
-      import App from './App.jsx';
-
-      const rootElement = document.getElementById('root');
-      if (rootElement) {
-        const root = ReactDOM.createRoot(rootElement);
-        root.render(
-          <React.StrictMode>
-            <App />
-          </React.StrictMode>
-        );
-      }
-    </script>
-  </body>
-</html>
+    // Fallback web si app absente
+    setTimeout(() => {
+      window.location.assign(href);
+    }, 800);
+  }, true);
+</script>
