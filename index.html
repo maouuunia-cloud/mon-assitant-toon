@@ -5,12 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>TextToon Assistant</title>
     
-    <!-- Configuration PWA -->
+    <!-- Configuration PWA (Effet App plein écran) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TextToon">
     <meta name="mobile-web-app-capable" content="yes">
     
+    <!-- Deep Linking : Protocoles pour forcer l'ouverture de l'application WEBTOON -->
+    <meta name="apple-itunes-app" content="app-id=881561345">
+    <meta property="al:ios:app_store_id" content="881561345">
+    <meta property="al:ios:app_name" content="WEBTOON">
+    <meta property="al:ios:url" content="linewebtoon://">
+
+    <meta property="al:android:package" content="com.naver.linewebtoon">
+    <meta property="al:android:app_name" content="WEBTOON">
+    <meta property="al:android:url" content="linewebtoon://">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -46,7 +56,35 @@
   <body>
     <div id="root"></div>
     
-    <!-- On charge App.jsx directement en précisant que c'est du Babel -->
+    <!-- Script global pour intercepter les redirections vers Webtoon -->
+    <script>
+      window.addEventListener('click', function(e) {
+        const target = e.target.closest('a');
+        if (target && target.href.includes('webtoons.com')) {
+          e.preventDefault();
+          const webtoonUrl = target.href;
+          
+          // Tentative d'ouverture via le protocole natif
+          // Format type: linewebtoon://title/list?titleNo=753
+          const urlParams = new URL(webtoonUrl).searchParams;
+          const titleNo = urlParams.get('title_no');
+          
+          const nativeAppUrl = titleNo 
+            ? `linewebtoon://title/list?titleNo=${titleNo}` 
+            : `linewebtoon://`;
+
+          // On tente d'ouvrir l'app
+          window.location.href = nativeAppUrl;
+
+          // Si l'app n'est pas installée, on ouvre le web après un court délai
+          setTimeout(() => {
+            window.location.href = webtoonUrl;
+          }, 500);
+        }
+      }, true);
+    </script>
+
+    <!-- Chargement de App.jsx -->
     <script type="text/babel" data-type="module" src="./App.jsx"></script>
 
     <!-- Script de lancement -->
