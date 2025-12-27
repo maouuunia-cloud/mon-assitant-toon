@@ -2,12 +2,22 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>TextToon Assistant</title>
+    
+    <!-- Configuration pour transformer le site en App (PWA) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TextToon">
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <!-- Chargement de Tailwind CSS pour le style -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Import Map pour résoudre les modules React sans compilateur lourd -->
+    <!-- Chargement de Babel pour transformer le JSX en temps réel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Import Map pour résoudre les modules React -->
     <script type="importmap">
       {
         "imports": {
@@ -17,25 +27,32 @@
         }
       }
     </script>
+
+    <style>
+      /* Empêche le défilement rebondissant sur iOS pour l'effet "App" */
+      body {
+        position: fixed;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
     
-    <!-- Le type="module" est essentiel ici -->
-    <script type="module">
+    <script type="text/babel" data-type="module">
       import React from 'react';
       import ReactDOM from 'react-dom/client';
-      
-      // Utilisation d'un chemin relatif explicite pour éviter les erreurs de résolution
       import App from './App.jsx';
 
       const rootElement = document.getElementById('root');
       if (rootElement) {
         const root = ReactDOM.createRoot(rootElement);
         root.render(
-          React.createElement(React.StrictMode, null, 
-            React.createElement(App)
-          )
+          <React.StrictMode>
+            <App />
+          </React.StrictMode>
         );
       }
     </script>
